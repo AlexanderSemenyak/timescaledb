@@ -1308,6 +1308,7 @@ chunk_create_from_hypercube_and_table_after_lock(const Hypertable *ht, Hypercube
 		CommandCounterIncrement();
 	}
 
+	// TODO concerning comment
 	/* Note that we do not automatically add constrains and triggers to the
 	 * chunk table when the chunk is created from an existing table. However,
 	 * PostgreSQL currently validates that CHECK constraints exists, but no
@@ -4783,9 +4784,8 @@ ts_chunk_merge_on_dimension(Chunk *chunk, const Chunk *merge_chunk, int32 dimens
 }
 
 /* Internal API used by OSM extension. OSM table is a foreign table that is
- * attached as a chunk of the hypertable. A chunk needs dimension constraints. We
- * add dummy constraints for the OSM chunk and then attach it to the hypertable.
- * OSM extension is responsible for maintaining any constraints on this table.
+ * attached as a chunk of the hypertable.  add_foreign_table_as_chunk makes
+ * sure that all check constraints are replicated on the child OSM chunk.
  */
 Datum
 ts_chunk_attach_osm_table_chunk(PG_FUNCTION_ARGS)

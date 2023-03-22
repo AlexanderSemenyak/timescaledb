@@ -352,6 +352,7 @@ chunk_create(PG_FUNCTION_ARGS)
 	const char *schema_name = PG_ARGISNULL(2) ? NULL : PG_GETARG_CSTRING(2);
 	const char *table_name = PG_ARGISNULL(3) ? NULL : PG_GETARG_CSTRING(3);
 	Oid chunk_table_relid = PG_ARGISNULL(4) ? InvalidOid : PG_GETARG_OID(4);
+	bool const copy_constraints = PG_GETARG_BOOL(5);
 	Cache *hcache = ts_hypertable_cache_pin();
 	Hypertable *ht = ts_hypertable_cache_get_entry(hcache, hypertable_relid, CACHE_FLAG_NONE);
 	Hypercube *hc;
@@ -382,6 +383,19 @@ chunk_create(PG_FUNCTION_ARGS)
 												 chunk_table_relid,
 												 &created);
 	Assert(NULL != chunk);
+
+	// TODO Parameters (en|dis)abling behavior is pretty smelly, so maybe this
+	// ought to be in a separate function.  Would need to ensure this returns
+	// all the bits needed though.  Might be more trouble than it's worth.
+	// Anyway, it's not even right yet.
+	if (copy_constraints) {
+		ts_chunk_constraints_add_inheritable_constraints(
+			// Maybe constraints isn't from the hypertable?
+			chunk->constraints,
+			chunk->fd.id,
+			chunk->relkind,
+			chunk->hypertable_relid);
+	}
 
 	tuple = chunk_form_tuple(chunk, ht, tupdesc, created);
 

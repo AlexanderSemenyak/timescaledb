@@ -55,7 +55,8 @@ CREATE OR REPLACE FUNCTION _timescaledb_internal.create_chunk(
        slices JSONB,
        schema_name NAME = NULL,
        table_name NAME = NULL,
-	   chunk_table REGCLASS = NULL)
+	   chunk_table REGCLASS = NULL,
+	   copy_constraints BOOL = false)
 RETURNS TABLE(chunk_id INTEGER, hypertable_id INTEGER, schema_name NAME, table_name NAME, relkind "char", slices JSONB, created BOOLEAN)
 AS '@MODULE_PATHNAME@', 'ts_chunk_create' LANGUAGE C VOLATILE;
 
